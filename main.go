@@ -47,6 +47,10 @@ func main() {
         if err != nil {
             return err
         }
+        // Skip hidden directories
+        if info.IsDir() && strings.HasPrefix(info.Name(), ".") {
+            return filepath.SkipDir
+        }
         if !info.IsDir() && (len(extMap) == 0 || extMap[filepath.Ext(filePath)]) {
             return appendToFile(outputFile, filePath)
         }
