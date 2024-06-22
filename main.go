@@ -47,9 +47,7 @@ func main() {
         }
     }
 
-    if verbose {
-        fmt.Println("Starting to walk through the directory...")
-    }
+    totalTokens := 0
 
     err = filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
         if err != nil {
@@ -57,9 +55,6 @@ func main() {
                 fmt.Println("Error accessing file:", filePath, err)
             }
             return err
-        }
-        if verbose {
-            fmt.Println("Processing:", filePath)
         }
 
         absFilePath, err := filepath.Abs(filePath)
@@ -91,12 +86,14 @@ func main() {
                 return nil
             }
             if len(extMap) == 0 || extMap[filepath.Ext(filePath)] {
-                if err := appendToFile(outputFile, filePath); err != nil {
+                tokens, err := appendToFile(outputFile, filePath)
+                if err != nil {
                     if verbose {
                         fmt.Println("Error writing file to output:", filePath, err)
                     }
                     return err
                 }
+                totalTokens += tokens
             }
         }
         return nil
@@ -107,20 +104,40 @@ func main() {
         os.Exit(1)
     }
 
+    fmt.Println("Total Tokens:", totalTokens)
     fmt.Println("All files have been combined into", outputFile.Name())
 }
 
-func appendToFile(outputFile *os.File, filePath string) error {
+func appendToFile(outputFile *os.File, filePath string) (int, error) {
     inputFile, err := os.Open(filePath)
     if err != nil {
-        return err
+        return 0, err
     }
     defer inputFile.Close()
 
-    if verbose {
-        fmt.Println("Appending file to output:", filePath)
+    content, err := io.ReadAll(inputFile)
+    if err != nil {
+        return 0, err
     }
-    _, err = io.Copy(outputFile, inputFile)
-    return err
+
+    tokenCount := countTokens(string(content))
+
+    _, err = outputFile.WriteString(fmt.Sprintf("File: %s\n", filepath.Base(filePath)))
+    if err != nil {
+        return tokenCount, err
+    }
+    _, err = outputFile.Write(content)
+    if err != nil {
+        return tokenCount, err
+    }
+    _, err = outputFile.WriteString("\n\n")
+
+    return tokenCount, err
 }
+
+func countTokens(text string) int {
+    tokens := strings.Fields(text)
+    return len(tokens)
+}
+
 
