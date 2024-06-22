@@ -47,12 +47,16 @@ func main() {
         if err != nil {
             return err
         }
-        // Skip hidden directories
-        if info.IsDir() && strings.HasPrefix(info.Name(), ".") {
-            return filepath.SkipDir
-        }
-        if !info.IsDir() && (len(extMap) == 0 || extMap[filepath.Ext(filePath)]) {
-            return appendToFile(outputFile, filePath)
+        // Check if the current path is a directory and if it starts with a dot.
+        if info.IsDir() {
+            if strings.HasPrefix(filepath.Base(filePath), ".") {
+                return filepath.SkipDir
+            }
+        } else {
+            // Process files if they meet the filetype criteria or if no filetypes are specified.
+            if len(extMap) == 0 || extMap[filepath.Ext(filePath)] {
+                return appendToFile(outputFile, filePath)
+            }
         }
         return nil
     })
