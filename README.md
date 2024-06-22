@@ -28,4 +28,4 @@ Combining python and javascript files from a specific directory into an output f
 ```
 
 TODO
-[] count and output tokens
+- [  ] count and output tokens
