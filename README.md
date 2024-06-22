@@ -26,3 +26,6 @@ Combining python and javascript files from a specific directory into an output f
 ```
 ./codectx --path="/path/to/project" --filetype=".py,.js" --output="project_context" --verbose
 ```
+
+TODO
+[] count and output tokens
