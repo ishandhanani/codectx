@@ -29,7 +29,6 @@ func main() {
     }
     defer outputFile.Close()
 
-    // Store full output path to skip it later
     outputFilePath, err := filepath.Abs(outputFile.Name())
     if err != nil {
         fmt.Println("Error getting absolute path of output file:", err)
@@ -59,7 +58,6 @@ func main() {
             }
             return err
         }
-        // Debug statement to check current file being processed
         if verbose {
             fmt.Println("Processing:", filePath)
         }
@@ -119,7 +117,6 @@ func appendToFile(outputFile *os.File, filePath string) error {
     }
     defer inputFile.Close()
 
-    // Debug statement before writing to file
     if verbose {
         fmt.Println("Appending file to output:", filePath)
     }
